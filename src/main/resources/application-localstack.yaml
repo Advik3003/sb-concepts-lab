@@ -11,6 +11,7 @@ app:
   description: Local AWS-compatible profile backed by Docker LocalStack.
   aws:
     region: us-east-1
+    account-id: "000000000000"
     access-key: test
     secret-key: test
     s3:
