@@ -1,0 +1,18 @@
+spring:
+  config:
+    activate:
+      on-profile: localstack
+
+server:
+  port: 8090
+
+app:
+  profile-name: localstack
+  description: Local AWS-compatible profile backed by Docker LocalStack.
+  aws:
+    region: us-east-1
+    access-key: test
+    secret-key: test
+    s3:
+      endpoint: http://localhost:4566
+      bucket-prefix: sb-concepts-lab

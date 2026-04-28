@@ -1,0 +1,11 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+server:
+  port: 8081
+
+app:
+  profile-name: dev
+  description: Shared development profile for early integration checks.

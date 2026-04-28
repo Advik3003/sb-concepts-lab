@@ -1,3 +1,16 @@
 spring:
   application:
     name: sb-concepts-lab
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+app:
+  profile-name: default
+  description: Base configuration shared by every runtime profile.
