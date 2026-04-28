@@ -10,7 +10,7 @@ This project uses Spring Boot profiles to keep environment-specific settings sep
 | local | `src/main/resources/application-local.yaml` | 8080 | Daily local development on a workstation. |
 | dev | `src/main/resources/application-dev.yaml` | 8081 | Shared development or early integration checks. |
 | qa | `src/main/resources/application-qa.yaml` | 8082 | QA verification before production-like runs. |
-| prod | `src/main/resources/application-prod.yaml` | 8083 | Production placeholder for hardened runtime settings. |
+| prod | `src/main/resources/application-prod.yaml` | 8083 | Production simulation with AWS-style settings and no real AWS calls. |
 | localstack | `src/main/resources/application-localstack.yaml` | 8090 | Local AWS-compatible testing with Docker LocalStack. |
 
 Spring always loads `application.yaml` first. When a profile is active, Spring overlays the matching `application-{profile}.yaml` file on top of the base configuration.
@@ -59,6 +59,20 @@ The application starts on port `8082`.
 
 The application starts on port `8083`.
 
+The `prod` profile also loads dummy AWS cloud values:
+
+```yaml
+app:
+  aws:
+    region: us-east-1
+    account-id: "123456789012"
+    s3:
+      endpoint: aws-managed
+      bucket-prefix: sb-concepts-lab-prod
+```
+
+These values are intentionally safe placeholders. They let the code behave as if it is running in an AWS-backed environment while avoiding any real cloud calls or credentials.
+
 ## Test the Existing API
 
 The current controller is available under `/app/v1/test`.
@@ -90,6 +104,30 @@ Hello Post string: local-profile
 ```
 
 For `dev`, `qa`, `prod`, or `localstack`, replace the port in the URL with the profile port from the table.
+
+### Cloud Simulation GET Test
+
+```powershell
+Invoke-RestMethod -Method Get -Uri "http://localhost:8083/app/v1/test/cloud"
+```
+
+Expected response when the `prod` profile is active:
+
+```text
+Cloud environment: aws-prod-simulation, account: 123456789012, region: us-east-1, s3 endpoint: aws-managed, bucket prefix: sb-concepts-lab-prod
+```
+
+### Cloud Simulation POST Test
+
+```powershell
+Invoke-RestMethod -Method Post -Uri "http://localhost:8083/app/v1/test/cloud?string=prod-s3-test"
+```
+
+Expected response when the `prod` profile is active:
+
+```text
+AWS production simulation accepted message for S3 workflow: prod-s3-test
+```
 
 ## Run with LocalStack
 
@@ -125,6 +163,8 @@ Test the current API through the LocalStack profile:
 ```powershell
 Invoke-RestMethod -Method Get -Uri "http://localhost:8090/app/v1/test/message"
 Invoke-RestMethod -Method Post -Uri "http://localhost:8090/app/v1/test?string=localstack-profile"
+Invoke-RestMethod -Method Get -Uri "http://localhost:8090/app/v1/test/cloud"
+Invoke-RestMethod -Method Post -Uri "http://localhost:8090/app/v1/test/cloud?string=localstack-s3-test"
 ```
 
 Stop LocalStack when finished:

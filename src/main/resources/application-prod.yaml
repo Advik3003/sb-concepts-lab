@@ -8,4 +8,12 @@ server:
 
 app:
   profile-name: prod
-  description: Production profile placeholder for hardened runtime configuration.
+  description: Production profile that simulates an AWS cloud runtime without calling AWS.
+  aws:
+    region: us-east-1
+    account-id: "123456789012"
+    access-key: use-iam-role-in-real-prod
+    secret-key: use-secrets-manager-in-real-prod
+    s3:
+      endpoint: aws-managed
+      bucket-prefix: sb-concepts-lab-prod
