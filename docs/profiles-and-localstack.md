@@ -1,0 +1,143 @@
+# Runtime Profiles and LocalStack Guide
+
+This project uses Spring Boot profiles to keep environment-specific settings separate from the application code. The current application exposes a small test API, so these profiles are intentionally lightweight and ready for later upgrades.
+
+## Profile Files
+
+| Profile | File | Port | Purpose |
+| --- | --- | ---: | --- |
+| default | `src/main/resources/application.yaml` | 8080 | Shared base configuration used by every run. |
+| local | `src/main/resources/application-local.yaml` | 8080 | Daily local development on a workstation. |
+| dev | `src/main/resources/application-dev.yaml` | 8081 | Shared development or early integration checks. |
+| qa | `src/main/resources/application-qa.yaml` | 8082 | QA verification before production-like runs. |
+| prod | `src/main/resources/application-prod.yaml` | 8083 | Production placeholder for hardened runtime settings. |
+| localstack | `src/main/resources/application-localstack.yaml` | 8090 | Local AWS-compatible testing with Docker LocalStack. |
+
+Spring always loads `application.yaml` first. When a profile is active, Spring overlays the matching `application-{profile}.yaml` file on top of the base configuration.
+
+## Run the Application
+
+Run these commands from the repository root.
+
+### Default Profile
+
+```powershell
+.\mvnw.cmd spring-boot:run
+```
+
+The application starts on port `8080`.
+
+### Local Profile
+
+```powershell
+.\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=local"
+```
+
+The application starts on port `8080`.
+
+### Dev Profile
+
+```powershell
+.\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=dev"
+```
+
+The application starts on port `8081`.
+
+### QA Profile
+
+```powershell
+.\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=qa"
+```
+
+The application starts on port `8082`.
+
+### Prod Profile
+
+```powershell
+.\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=prod"
+```
+
+The application starts on port `8083`.
+
+## Test the Existing API
+
+The current controller is available under `/app/v1/test`.
+
+Use the port for whichever profile is running.
+
+### GET Test
+
+```powershell
+Invoke-RestMethod -Method Get -Uri "http://localhost:8080/app/v1/test/message"
+```
+
+Expected response:
+
+```text
+test
+```
+
+### POST Test
+
+```powershell
+Invoke-RestMethod -Method Post -Uri "http://localhost:8080/app/v1/test?string=local-profile"
+```
+
+Expected response:
+
+```text
+Hello Post string: local-profile
+```
+
+For `dev`, `qa`, `prod`, or `localstack`, replace the port in the URL with the profile port from the table.
+
+## Run with LocalStack
+
+LocalStack gives the project a local AWS-compatible endpoint. The current code does not call S3 yet, but this profile and Docker service create a clean path for the next upgrade.
+
+Start LocalStack:
+
+```powershell
+docker compose -f docker-compose.localstack.yml up -d
+```
+
+Run the application with the `localstack` profile:
+
+```powershell
+.\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=localstack"
+```
+
+The application starts on port `8090`, and the profile exposes these future AWS settings:
+
+```yaml
+app:
+  aws:
+    region: us-east-1
+    access-key: test
+    secret-key: test
+    s3:
+      endpoint: http://localhost:4566
+      bucket-prefix: sb-concepts-lab
+```
+
+Test the current API through the LocalStack profile:
+
+```powershell
+Invoke-RestMethod -Method Get -Uri "http://localhost:8090/app/v1/test/message"
+Invoke-RestMethod -Method Post -Uri "http://localhost:8090/app/v1/test?string=localstack-profile"
+```
+
+Stop LocalStack when finished:
+
+```powershell
+docker compose -f docker-compose.localstack.yml down
+```
+
+## Recommended Upgrade Path
+
+When the S3-like feature is added, keep the same profile structure:
+
+- Use `local` for filesystem-backed local S3 behavior.
+- Use `localstack` for AWS SDK integration against `http://localhost:4566`.
+- Keep `dev`, `qa`, and `prod` ready for environment-specific storage values.
+- Keep test APIs simple with `GET` and `POST` until the project intentionally expands the API contract.

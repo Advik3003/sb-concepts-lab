@@ -1,0 +1,16 @@
+---
+description: Testing-only API endpoint conventions
+globs: src/**/*.java
+alwaysApply: false
+---
+
+# Testing-Only API Endpoint Conventions
+
+When creating or modifying APIs for testing only:
+
+- Create these APIs only for testing.
+- Use only `GET` and `POST` HTTP methods.
+- Do not introduce `PUT`, `PATCH`, `DELETE`, or other HTTP methods unless the user explicitly asks for them.
+- Keep API request and response values as strings.
+- Prefer `String` for path variables, query parameters, request bodies, response bodies, and DTO fields exposed through APIs.
+- If a non-string type seems necessary, ask the user before adding it.

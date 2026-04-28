@@ -1,0 +1,11 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+
+server:
+  port: 8080
+
+app:
+  profile-name: local
+  description: Local developer profile for running the application on a workstation.

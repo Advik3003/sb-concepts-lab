@@ -1,0 +1,11 @@
+spring:
+  config:
+    activate:
+      on-profile: qa
+
+server:
+  port: 8082
+
+app:
+  profile-name: qa
+  description: QA profile for test verification before production-like runs.

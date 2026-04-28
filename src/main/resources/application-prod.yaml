@@ -1,0 +1,11 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+server:
+  port: 8083
+
+app:
+  profile-name: prod
+  description: Production profile placeholder for hardened runtime configuration.
