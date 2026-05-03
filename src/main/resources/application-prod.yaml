@@ -6,6 +6,15 @@ spring:
 server:
   port: 8083
 
+logging:
+  structured:
+    format:
+      console: logstash
+  level:
+    root: INFO
+    sb.concepts.lab: INFO
+    org.springframework: WARN
+
 app:
   profile-name: prod
   description: Production profile that simulates an AWS cloud runtime without calling AWS.

@@ -6,6 +6,15 @@ spring:
 server:
   port: 8090
 
+logging:
+  structured:
+    format:
+      console: logstash
+  level:
+    root: INFO
+    sb.concepts.lab: DEBUG
+    software.amazon.awssdk: WARN
+
 app:
   profile-name: localstack
   description: Local AWS-compatible profile backed by Docker LocalStack.

@@ -6,6 +6,11 @@ spring:
 server:
   port: 8080
 
+logging:
+  level:
+    root: INFO
+    sb.concepts.lab: DEBUG
+
 app:
   profile-name: local
   description: Local developer profile for running the application on a workstation.
