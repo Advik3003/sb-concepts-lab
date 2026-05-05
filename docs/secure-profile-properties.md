@@ -474,3 +474,46 @@ app:
 ```
 
 This keeps local testing simple while making the production path safer when the project is upgraded.
+
+## Hinglish Summary
+
+Is guide ka main point ye hai ki kaunse profile properties Git me commit karna safe hai aur kaunse values secure source se aani chahiye. Spring Boot YAML files me normal configuration rakhna theek hai, lekin real credentials kabhi commit nahi karne chahiye.
+
+Safe values jo usually commit ho sakti hain:
+
+- `spring.application.name`
+- `server.port`
+- `app.profile-name`
+- `app.description`
+- Non-secret region values jaise `us-east-1`
+- Local endpoints jaise `http://localhost:4566`
+- Dummy bucket prefixes jo sensitive information expose nahi karte
+
+Sensitive values jo secure rakhni chahiye:
+
+- AWS access key aur secret key
+- Database password
+- API tokens
+- Private certificates
+- Encryption keys
+- Real production account details
+
+Spring Boot me environment variable fallback ka pattern useful hai:
+
+```yaml
+app:
+  aws:
+    region: ${AWS_REGION:us-east-1}
+    secret-key: ${AWS_SECRET_ACCESS_KEY:use-secrets-manager-in-real-prod}
+```
+
+Iska matlab hai agar `AWS_SECRET_ACCESS_KEY` environment variable available hai to Spring usko use karega. Agar available nahi hai to safe placeholder value use hogi. Placeholder kabhi real secret nahi hona chahiye.
+
+Production ke liye best approach:
+
+- Real AWS me IAM role use karo.
+- Secrets ke liye AWS Secrets Manager ya SSM Parameter Store use karo.
+- App startup par required production secrets missing ho to fail fast karo.
+- Logs me secret values kabhi print mat karo.
+
+Short recommendation: Git me sirf non-secret wiring rakho. Real secrets environment variables, IAM roles, ya secrets manager se do. Local simulation ke liye safe dummy values use karo, lekin production me fake fallback par app silently run nahi honi chahiye.

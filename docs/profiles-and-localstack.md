@@ -181,3 +181,28 @@ When the S3-like feature is added, keep the same profile structure:
 - Use `localstack` for AWS SDK integration against `http://localhost:4566`.
 - Keep `dev`, `qa`, and `prod` ready for environment-specific storage values.
 - Keep test APIs simple with `GET` and `POST` until the project intentionally expands the API contract.
+
+## Hinglish Summary
+
+Is project me Spring Boot profiles ka use environment-specific configuration separate rakhne ke liye hota hai. `application.yaml` base configuration hai, aur `application-local.yaml`, `application-dev.yaml`, `application-qa.yaml`, `application-prod.yaml`, aur `application-localstack.yaml` uske upar profile-specific values apply karte hain.
+
+- `local` profile daily development ke liye hai. Isme app normally port `8080` par run hoti hai.
+- `dev` shared development testing ke liye hai, jaha team integration checks kar sakti hai.
+- `qa` release verification ke liye hai, jaha behavior stable aur repeatable hona chahiye.
+- `prod` real production jaisa simulation deta hai, lekin abhi safe dummy AWS-style values use karta hai.
+- `localstack` local machine par AWS-compatible testing ke liye hai, jaha Docker LocalStack endpoint `http://localhost:4566` use hota hai.
+
+Run karte time profile command me pass karo:
+
+```powershell
+.\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=local"
+.\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=localstack"
+```
+
+LocalStack use karne ke liye pehle Docker service start karo:
+
+```powershell
+docker compose -f docker-compose.localstack.yml up -d
+```
+
+Short recommendation: local development ke liye `local`, AWS-like local testing ke liye `localstack`, team testing ke liye `dev` aur `qa`, aur production simulation ke liye `prod` profile use karo. Real secrets kabhi YAML me hard-code mat karo.
