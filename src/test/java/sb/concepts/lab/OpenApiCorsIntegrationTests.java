@@ -32,11 +32,11 @@ class OpenApiCorsIntegrationTests {
     @Test
     void corsPreflightAllowsConfiguredLocalOriginForApiRoutes() throws Exception {
         mockMvc.perform(options("/app/v1/test/message")
-                        .header(HttpHeaders.ORIGIN, "http://localhost:3000")
+                        .header(HttpHeaders.ORIGIN, "http://localhost:5173")
                         .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "GET")
                         .header(HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS, "X-Request-Id"))
                 .andExpect(status().isOk())
-                .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "http://localhost:3000"))
+                .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "http://localhost:5173"))
                 .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, containsString("GET")))
                 .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS, containsString("X-Request-Id")));
     }
@@ -44,10 +44,10 @@ class OpenApiCorsIntegrationTests {
     @Test
     void corsPreflightAllowsConfiguredLocalOriginForOpenApiRoutes() throws Exception {
         mockMvc.perform(options("/v3/api-docs")
-                        .header(HttpHeaders.ORIGIN, "http://localhost:3000")
+                        .header(HttpHeaders.ORIGIN, "http://localhost:5173")
                         .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "GET"))
                 .andExpect(status().isOk())
-                .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "http://localhost:3000"))
+                .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "http://localhost:5173"))
                 .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, containsString("GET")));
     }
 
@@ -55,6 +55,14 @@ class OpenApiCorsIntegrationTests {
     void corsPreflightRejectsUnknownOrigin() throws Exception {
         mockMvc.perform(options("/app/v1/test/message")
                         .header(HttpHeaders.ORIGIN, "https://unknown.example.com")
+                        .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "GET"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void corsPreflightRejectsGrafanaDefaultLocalOrigin() throws Exception {
+        mockMvc.perform(options("/app/v1/test/message")
+                        .header(HttpHeaders.ORIGIN, "http://localhost:3000")
                         .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "GET"))
                 .andExpect(status().isForbidden());
     }

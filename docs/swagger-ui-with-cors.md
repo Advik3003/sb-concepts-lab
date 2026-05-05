@@ -9,7 +9,7 @@ CORS means Cross-Origin Resource Sharing. It is a browser security mechanism tha
 Different origins:
 
 ```text
-Swagger UI: http://localhost:3000
+Swagger UI: http://localhost:5173
 API:        http://localhost:8080
 ```
 
@@ -63,7 +63,7 @@ That may work during development, but it is a poor production default.
 
 For a Spring Boot WebMVC application, CORS can be configured with `WebMvcConfigurer`. This project now uses `src/main/java/sb/concepts/lab/config/CorsConfig.java` with values from `app.cors`.
 
-Implemented shape for local Swagger UI hosted on port `3000`:
+Implemented shape for local Swagger UI hosted on port `5173`:
 
 ```java
 package sb.concepts.lab.config;
@@ -82,7 +82,7 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/app/**")
-                        .allowedOrigins("http://localhost:3000")
+                        .allowedOrigins("http://localhost:5173")
                         .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                         .allowedHeaders("Authorization", "Content-Type", "X-Request-Id", "X-Correlation-Id")
                         .exposedHeaders("X-Request-Id", "X-Correlation-Id")
@@ -94,7 +94,7 @@ public class CorsConfig {
 }
 ```
 
-This allows a browser app or externally hosted Swagger UI at `http://localhost:3000` to call API paths under `/app/**`.
+This allows a browser app or externally hosted Swagger UI at `http://localhost:5173` to call API paths under `/app/**`.
 
 ## Include OpenAPI Paths When Needed
 
@@ -102,7 +102,7 @@ If external Swagger UI must fetch OpenAPI JSON from the API server, also allow `
 
 ```java
 registry.addMapping("/v3/api-docs/**")
-        .allowedOrigins("http://localhost:3000")
+        .allowedOrigins("http://localhost:5173")
         .allowedMethods("GET", "OPTIONS")
         .allowedHeaders("Content-Type")
         .allowCredentials(false)
@@ -121,7 +121,7 @@ Example YAML:
 app:
   cors:
     allowed-origins:
-      - http://localhost:3000
+      - http://localhost:5173
     allowed-methods:
       - GET
       - POST
@@ -146,13 +146,13 @@ Professional profile guidance:
 
 | Environment | Allowed Origins |
 | --- | --- |
-| local | Local frontend ports, for example `http://localhost:3000` |
+| local | Local frontend port, for example `http://localhost:5173` |
 | localstack | Local docs or frontend origins only |
 | dev | Dev frontend or docs domain |
 | qa | QA frontend or docs domain |
 | prod | Production domains only, preferably behind HTTPS |
 
-Never allow local origins like `http://localhost:3000` in real production unless there is a deliberate, documented reason.
+Never allow local origins like `http://localhost:5173` in real production unless there is a deliberate, documented reason.
 
 ## Credentials Rule
 
@@ -272,7 +272,7 @@ Invoke-WebRequest `
   -Method Options `
   -Uri "http://localhost:8080/app/v1/test/message" `
   -Headers @{
-    "Origin" = "http://localhost:3000"
+    "Origin" = "http://localhost:5173"
     "Access-Control-Request-Method" = "GET"
   }
 ```
@@ -286,7 +286,7 @@ Invoke-WebRequest `
   -Method Get `
   -Uri "http://localhost:8080/app/v1/test/message" `
   -Headers @{
-    "Origin" = "http://localhost:3000"
+    "Origin" = "http://localhost:5173"
   }
 ```
 
@@ -373,7 +373,7 @@ For this project, these defaults are implemented:
 1. Swagger UI is available from the Spring Boot app for same-origin use.
 2. CORS applies to `/app/**` for API calls.
 3. CORS applies to `/v3/api-docs/**` for external Swagger UI.
-4. Local browser origins include `http://localhost:3000` and `http://localhost:5173`.
+4. Local browser origin uses `http://localhost:5173`; `http://localhost:3000` is avoided because it commonly points to Grafana.
 5. `X-Request-Id` and `X-Correlation-Id` are exposed so browser clients can report IDs from logs.
 6. Shared and production-like profiles use explicit HTTPS placeholder origins.
 
@@ -386,7 +386,7 @@ CORS ki zarurat tab hoti hai jab browser me loaded Swagger UI ya frontend app AP
 Cross-origin example:
 
 ```text
-Swagger UI: http://localhost:3000
+Swagger UI: http://localhost:5173
 API:        http://localhost:8080
 ```
 
@@ -400,14 +400,14 @@ Professional CORS rules:
 - Sirf required HTTP methods allow karo.
 - Sirf required headers allow karo.
 - Credentials tabhi allow karo jab cookies ya browser auth actually use ho rahe hon.
-- Production me local origins jaise `http://localhost:3000` allow mat rakho.
+- Production me local origins jaise `http://localhost:5173` allow mat rakho.
 - `allowCredentials(true)` ke saath wildcard origin `*` use mat karo.
 
 Is project me CORS config `CorsConfig` aur `app.cors` properties se implement ho chuka hai. Spring Boot WebMVC me basic CORS config `WebMvcConfigurer` se hota hai:
 
 ```java
 registry.addMapping("/app/**")
-        .allowedOrigins("http://localhost:3000")
+        .allowedOrigins("http://localhost:5173")
         .allowedMethods("GET", "POST", "OPTIONS")
         .allowedHeaders("Authorization", "Content-Type", "X-Request-Id", "X-Correlation-Id")
         .exposedHeaders("X-Request-Id", "X-Correlation-Id")
@@ -423,7 +423,7 @@ Invoke-WebRequest `
   -Method Options `
   -Uri "http://localhost:8080/app/v1/test/message" `
   -Headers @{
-    "Origin" = "http://localhost:3000"
+    "Origin" = "http://localhost:5173"
     "Access-Control-Request-Method" = "GET"
   }
 ```

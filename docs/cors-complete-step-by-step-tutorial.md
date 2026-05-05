@@ -17,7 +17,7 @@ scheme + host + port
 Examples:
 
 ```text
-http://localhost:3000
+http://localhost:5173
 http://localhost:8080
 https://api.example.com
 https://grafana.example.com
@@ -26,7 +26,7 @@ https://grafana.example.com
 These two are different origins because the ports are different:
 
 ```text
-Frontend: http://localhost:3000
+Frontend: http://localhost:5173
 Backend:  http://localhost:8080
 ```
 
@@ -47,7 +47,7 @@ Origin ka matlab hota hai:
 scheme + host + port
 ```
 
-Example: `http://localhost:3000` aur `http://localhost:8080` same machine par hain, lekin port different hai. Isliye browser ke liye ye cross-origin request hai.
+Example: `http://localhost:5173` aur `http://localhost:8080` same machine par hain, lekin port different hai. Isliye browser ke liye ye cross-origin request hai.
 
 ## 2. Why CORS Exists
 
@@ -74,7 +74,7 @@ CORS is needed when a browser client calls an API from a different origin.
 
 Common cases:
 
-- React app at `http://localhost:3000` calls Spring Boot API at `http://localhost:8080`.
+- React or Vite app at `http://localhost:5173` calls Spring Boot API at `http://localhost:8080`.
 - Vite app at `http://localhost:5173` calls backend API at `http://localhost:8080`.
 - Swagger UI hosted at `https://docs.example.com` calls API at `https://api.example.com`.
 - Admin portal calls API from another domain.
@@ -93,7 +93,7 @@ CORS tab chahiye jab browser me running frontend dusre origin ke backend ko call
 Example:
 
 ```text
-React UI:    http://localhost:3000
+Frontend UI: http://localhost:5173
 Spring API:  http://localhost:8080
 ```
 
@@ -137,7 +137,7 @@ Use CORS in a backend only when that backend is called directly from browser Jav
 Use CORS:
 
 ```text
-React UI:  http://localhost:3000
+React UI:  http://localhost:5173
 Backend:   http://localhost:8080
 ```
 
@@ -240,6 +240,14 @@ But if Grafana backend queries a data source server-to-server, CORS is usually n
 
 If your API request reaches Grafana login, first check routing and authentication. That usually means the request went to the Grafana host or gateway route, not directly to the Spring Boot API.
 
+Local Grafana commonly runs on:
+
+```text
+http://localhost:3000
+```
+
+For this project, do not use `http://localhost:3000` as the allowed frontend origin because it conflicts with Grafana's default local URL. Use `http://localhost:5173` for local browser frontend testing instead.
+
 ### Hinglish
 
 Sabse important clarity ye hai: CORS har backend project me blindly apply nahi karna chahiye. CORS tab use karo jab browser-based frontend alag origin se backend API call kar raha ho.
@@ -257,7 +265,7 @@ Backend application me CORS normally nahi chahiye:
 - API ko dusra backend service call kar raha hai.
 - Microservices ek dusre ko call kar rahe hain.
 
-Web application me CORS common hai kyunki browser enforce karta hai. Agar frontend `http://localhost:3000` par hai aur backend `http://localhost:8080` par hai, to CORS chahiye. Agar reverse proxy dono ko same origin bana deta hai, to CORS ki zarurat nahi hoti.
+Web application me CORS common hai kyunki browser enforce karta hai. Agar frontend `http://localhost:5173` par hai aur backend `http://localhost:8080` par hai, to CORS chahiye. Agar reverse proxy dono ko same origin bana deta hai, to CORS ki zarurat nahi hoti.
 
 Mobile app me CORS normally nahi chahiye. Android/iOS browser CORS policy enforce nahi karte jaise web browser karta hai. Mobile ke liye authentication, token security, HTTPS, rate limit, aur authorization important hain.
 
@@ -286,7 +294,7 @@ The browser sends preflight when the request uses things like:
 Preflight asks the API:
 
 ```text
-Can origin http://localhost:3000 send a GET request with header X-Request-Id?
+Can origin http://localhost:5173 send a GET request with header X-Request-Id?
 ```
 
 If the API returns correct CORS headers, the browser sends the real request.
@@ -296,7 +304,7 @@ If the API returns correct CORS headers, the browser sends the real request.
 Preflight ek permission check hai. Browser pehle `OPTIONS` request bhejta hai aur API se poochta hai:
 
 ```text
-Kya http://localhost:3000 ko GET/POST/PUT call karne ki permission hai?
+Kya http://localhost:5173 ko GET/POST/PUT call karne ki permission hai?
 Kya X-Request-Id ya Authorization header bhejne ki permission hai?
 ```
 
@@ -346,7 +354,6 @@ The main CORS settings are in `application.yaml`:
 app:
   cors:
     allowed-origins:
-      - http://localhost:3000
       - http://localhost:5173
     allowed-methods:
       - GET
@@ -391,8 +398,9 @@ Main paths:
 
 Allowed local origins:
 
-- `http://localhost:3000`
 - `http://localhost:5173`
+
+`http://localhost:3000` is intentionally not allowed in this project because it commonly points to Grafana login locally.
 
 Iska matlab agar React ya Vite app in ports se API call karegi to CORS allow hoga.
 
@@ -405,7 +413,6 @@ Write down exact browser origins.
 Local examples:
 
 ```text
-http://localhost:3000
 http://localhost:5173
 ```
 
@@ -455,7 +462,6 @@ Add or update:
 app:
   cors:
     allowed-origins:
-      - http://localhost:3000
       - http://localhost:5173
     allowed-methods:
       - GET
@@ -549,7 +555,7 @@ Invoke-WebRequest `
   -Method Options `
   -Uri "http://localhost:8080/app/v1/test/message" `
   -Headers @{
-    "Origin" = "http://localhost:3000"
+    "Origin" = "http://localhost:5173"
     "Access-Control-Request-Method" = "GET"
     "Access-Control-Request-Headers" = "X-Request-Id"
   }
@@ -559,7 +565,7 @@ Expected result:
 
 - Status should be `200`.
 - Response should include `Access-Control-Allow-Origin`.
-- Value should be `http://localhost:3000`.
+- Value should be `http://localhost:5173`.
 - Response should include allowed methods and headers.
 
 ### Test 4: Test Unknown Origin
@@ -589,7 +595,7 @@ Invoke-WebRequest `
   -Method Options `
   -Uri "http://localhost:8080/v3/api-docs" `
   -Headers @{
-    "Origin" = "http://localhost:3000"
+    "Origin" = "http://localhost:5173"
     "Access-Control-Request-Method" = "GET"
   }
 ```
@@ -597,7 +603,7 @@ Invoke-WebRequest `
 Expected:
 
 - Status `200`.
-- `Access-Control-Allow-Origin` should be `http://localhost:3000`.
+- `Access-Control-Allow-Origin` should be `http://localhost:5173`.
 
 ### Test 6: Test In Browser
 
@@ -637,6 +643,7 @@ Possible reasons:
 - The browser is following a redirect from API domain to Grafana domain.
 - The frontend base URL is configured as Grafana instead of API.
 - Swagger UI server URL points to Grafana instead of Spring Boot.
+- Local origin or browser URL uses `http://localhost:3000`, which is commonly Grafana.
 
 Example wrong setup:
 
@@ -691,6 +698,8 @@ In browser DevTools:
 ### Hinglish
 
 Agar request Grafana login URL tak pahunch rahi hai, to iska matlab ye ho sakta hai ki request galat route par ja rahi hai. Ye sirf CORS ka issue nahi hota.
+
+Important local rule: is project me `http://localhost:3000` ko CORS allowed origin se hata diya gaya hai, kyunki local machine par ye port commonly Grafana login ke liye use hota hai. Local frontend testing ke liye `http://localhost:5173` use karo.
 
 Common reasons:
 
@@ -759,7 +768,7 @@ Common mistakes:
 
 - Production me `*` origin allow kar dena.
 - Browser test na karna.
-- `localhost:3000` aur `localhost:8080` ko same origin samajhna.
+- `localhost:5173` aur `localhost:8080` ko same origin samajhna.
 - Swagger ke liye `/v3/api-docs/**` allow na karna.
 - API base URL galat configure karna.
 - Grafana ya proxy route ko API route samajh lena.

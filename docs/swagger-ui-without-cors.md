@@ -25,7 +25,7 @@ Because all requests use `http://localhost:8080`, the browser does not need CORS
 Cross-origin example:
 
 ```text
-Swagger UI: http://localhost:3000
+Swagger UI: http://localhost:5173
 API docs:   http://localhost:8080/v3/api-docs
 API call:   http://localhost:8080/app/v1/test/message
 ```
