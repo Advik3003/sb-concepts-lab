@@ -22,3 +22,24 @@ logging:
 app:
   profile-name: default
   description: Base configuration shared by every runtime profile.
+  cors:
+    allowed-origins:
+      - http://localhost:3000
+      - http://localhost:5173
+    allowed-methods:
+      - GET
+      - POST
+      - PUT
+      - PATCH
+      - DELETE
+      - OPTIONS
+    allowed-headers:
+      - Authorization
+      - Content-Type
+      - X-Request-Id
+      - X-Correlation-Id
+    exposed-headers:
+      - X-Request-Id
+      - X-Correlation-Id
+    allow-credentials: false
+    max-age: 3600

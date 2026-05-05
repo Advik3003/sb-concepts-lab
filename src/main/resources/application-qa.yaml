@@ -17,3 +17,6 @@ logging:
 app:
   profile-name: qa
   description: QA profile for test verification before production-like runs.
+  cors:
+    allowed-origins:
+      - https://qa.example.com

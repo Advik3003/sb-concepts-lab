@@ -61,9 +61,9 @@ That may work during development, but it is a poor production default.
 
 ## Simple Spring Boot WebMVC CORS Configuration
 
-For a Spring Boot WebMVC application, CORS can be configured with `WebMvcConfigurer`.
+For a Spring Boot WebMVC application, CORS can be configured with `WebMvcConfigurer`. This project now uses `src/main/java/sb/concepts/lab/config/CorsConfig.java` with values from `app.cors`.
 
-Example for local Swagger UI hosted on port `3000`:
+Implemented shape for local Swagger UI hosted on port `3000`:
 
 ```java
 package sb.concepts.lab.config;
@@ -368,14 +368,14 @@ Before enabling CORS in production:
 
 ## Recommended Setup For This Project
 
-For this project, use these defaults:
+For this project, these defaults are implemented:
 
-1. No CORS for same-origin Swagger UI served by Spring Boot.
-2. CORS only if Swagger UI or a frontend runs from a different origin.
-3. Allow `/v3/api-docs/**` for external Swagger UI.
-4. Allow `/app/**` for API calls.
-5. Expose `X-Request-Id` and `X-Correlation-Id` so browser clients can report IDs from logs.
-6. Keep production origins explicit and HTTPS-only.
+1. Swagger UI is available from the Spring Boot app for same-origin use.
+2. CORS applies to `/app/**` for API calls.
+3. CORS applies to `/v3/api-docs/**` for external Swagger UI.
+4. Local browser origins include `http://localhost:3000` and `http://localhost:5173`.
+5. `X-Request-Id` and `X-Correlation-Id` are exposed so browser clients can report IDs from logs.
+6. Shared and production-like profiles use explicit HTTPS placeholder origins.
 
 CORS should be treated as part of the API security boundary. Add it deliberately, keep it narrow, and test it in a browser.
 
@@ -403,7 +403,7 @@ Professional CORS rules:
 - Production me local origins jaise `http://localhost:3000` allow mat rakho.
 - `allowCredentials(true)` ke saath wildcard origin `*` use mat karo.
 
-Spring Boot WebMVC me basic CORS config `WebMvcConfigurer` se ho sakta hai:
+Is project me CORS config `CorsConfig` aur `app.cors` properties se implement ho chuka hai. Spring Boot WebMVC me basic CORS config `WebMvcConfigurer` se hota hai:
 
 ```java
 registry.addMapping("/app/**")

@@ -45,15 +45,15 @@ No-CORS setup is simpler, safer, and easier to deploy.
 
 ## Add Swagger UI To A Spring Boot WebMVC App
 
-This project currently uses Spring Boot WebMVC. A common OpenAPI integration for Spring Boot is `springdoc-openapi`.
+This project uses Spring Boot WebMVC and now includes `springdoc-openapi` for Swagger UI.
 
-When adding it, use the current compatible version from the official springdoc documentation. The dependency shape is usually:
+Implemented dependency in `pom.xml`:
 
 ```xml
 <dependency>
     <groupId>org.springdoc</groupId>
     <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-    <version><!-- use the current compatible version --></version>
+    <version>${springdoc-openapi.version}</version>
 </dependency>
 ```
 
@@ -104,9 +104,9 @@ Since every request goes to the same origin, no browser CORS preflight is needed
 
 ## Recommended OpenAPI Metadata
 
-Add clear API metadata when the project is ready for Swagger documentation.
+The project exposes clear API metadata through `src/main/java/sb/concepts/lab/config/OpenApiConfig.java`.
 
-Example configuration:
+Current configuration shape:
 
 ```java
 package sb.concepts.lab.config;
@@ -122,6 +122,7 @@ public class OpenApiConfig {
     @Bean
     public OpenAPI applicationOpenAPI() {
         return new OpenAPI()
+                .servers(List.of(new Server().url("/")))
                 .info(new Info()
                         .title("SB Concepts Lab API")
                         .description("API documentation for the Spring Boot concepts lab.")
@@ -287,7 +288,7 @@ Professional default ye hona chahiye:
 - Jab tak real cross-origin browser frontend na ho, CORS rules add mat karo.
 - Sirf error fix karne ke liye permissive `*` CORS config mat lagao.
 
-Spring Boot WebMVC app me Swagger UI add karne ke liye commonly `springdoc-openapi-starter-webmvc-ui` dependency use hoti hai. Version official springdoc documentation se compatible choose karna chahiye.
+Is Spring Boot WebMVC app me Swagger UI ke liye `springdoc-openapi-starter-webmvc-ui` dependency add ho chuki hai. API metadata `OpenApiConfig` se provide hota hai.
 
 Run command:
 

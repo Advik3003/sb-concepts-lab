@@ -18,6 +18,11 @@ logging:
 app:
   profile-name: localstack
   description: Local AWS-compatible profile backed by Docker LocalStack.
+  cors:
+    allowed-origins:
+      - http://localhost:3000
+      - http://localhost:5173
+      - http://localhost:8090
   aws:
     region: us-east-1
     account-id: "000000000000"

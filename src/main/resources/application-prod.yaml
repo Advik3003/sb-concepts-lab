@@ -18,6 +18,9 @@ logging:
 app:
   profile-name: prod
   description: Production profile that simulates an AWS cloud runtime without calling AWS.
+  cors:
+    allowed-origins:
+      - https://api.example.com
   aws:
     region: us-east-1
     account-id: "123456789012"

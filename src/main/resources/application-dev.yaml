@@ -17,3 +17,8 @@ logging:
 app:
   profile-name: dev
   description: Shared development profile for early integration checks.
+  cors:
+    allowed-origins:
+      - http://localhost:3000
+      - http://localhost:5173
+      - https://dev.example.com
